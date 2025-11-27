@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fin-Tech Solutions Quotation</title>
+    <!-- Import html2pdf library for true file downloading -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* --- VISUAL CONFIGURATION --- */
         :root {
@@ -33,14 +35,18 @@
         /* --- THE A4 PAGE --- */
         .page {
             width: 210mm;
-            min-width: 210mm; /* Force A4 width to prevent squishing */
+            min-width: 210mm;
+            /* STRICT 1 PAGE ENFORCEMENT */
             height: 297mm; 
-            min-height: 297mm;
+            max-height: 297mm;
+            overflow: hidden; /* Cuts off anything that spills over */
+            
             background: white;
             padding: 15mm 15mm;
             box-sizing: border-box;
             position: relative;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            
             /* Transform settings for mobile scaling */
             transform-origin: top center;
             transition: transform 0.2s ease;
@@ -253,29 +259,19 @@
         
         .helper-text { font-size: 11px; color: #bdc3c7; text-align: center; margin-top: 15px; font-style: italic; }
 
-        @media print {
-            body { background: none; margin: 0; padding: 0; display: block; }
-            .page { 
-                box-shadow: none; 
-                margin: 0; 
-                width: 210mm; 
-                height: 297mm; 
-                page-break-after: always;
-                transform: none !important; /* Reset scaling for print */
-            }
-            .controls { display: none !important; }
-            [contenteditable]:hover { outline: none; background: none; }
-        }
+        /* HIDE CONTROLS WHEN GENERATING PDF IF NEEDED */
+        .hide-for-pdf .controls { display: none !important; }
     </style>
 </head>
 <body>
 
-    <!-- CONTROL PANEL (Visible on Screen, Hidden on Print) -->
+    <!-- CONTROL PANEL -->
     <div class="controls">
         <h3>⚙️ CONTROLS</h3>
         <button class="btn btn-blue" onclick="calculate()">🔄 RECALCULATE</button>
-        <button class="btn btn-green" onclick="window.print()">⬇️ DOWNLOAD PDF</button>
-        <div class="helper-text">Edit the document by clicking directly on the text areas.</div>
+        <!-- Calls the new PDF function instead of window.print() -->
+        <button class="btn btn-green" onclick="generatePDF()">⬇️ DOWNLOAD PDF</button>
+        <div class="helper-text">Edit by clicking text. System works on Android/iOS/PC.</div>
     </div>
 
     <!-- THE A4 DOCUMENT -->
@@ -293,9 +289,8 @@
             </div>
             
             <!-- PERMANENT LOGO -->
-            <!-- Vercel will look for 'LOGO.jpeg' in the root folder -->
             <div>
-                <img src="LOGO.jpeg" alt="Fin-Tech Solutions" class="logo-img" onerror="this.style.display='none'; alert('Logo not found! Make sure LOGO.jpeg is in the same folder.');">
+                <img src="LOGO.jpeg" alt="Fin-Tech Solutions" class="logo-img" onerror="this.style.display='none';">
             </div>
         </div>
 
@@ -331,7 +326,7 @@
                 </tr>
             </thead>
             <tbody id="invoice-body">
-                <!-- 10 Editable Rows -->
+                <!-- 10 Rows Fixed -->
                 <tr><td class="col-no">1.</td><td contenteditable="true"></td><td class="col-qty" contenteditable="true" onblur="calculate()"></td><td class="col-price" contenteditable="true" onblur="calculate()"></td><td class="col-amt"></td></tr>
                 <tr><td class="col-no">2.</td><td contenteditable="true"></td><td class="col-qty" contenteditable="true" onblur="calculate()"></td><td class="col-price" contenteditable="true" onblur="calculate()"></td><td class="col-amt"></td></tr>
                 <tr><td class="col-no">3.</td><td contenteditable="true"></td><td class="col-qty" contenteditable="true" onblur="calculate()"></td><td class="col-price" contenteditable="true" onblur="calculate()"></td><td class="col-amt"></td></tr>
@@ -390,39 +385,61 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // Set Default Date
         const today = new Date();
         document.getElementById('date-field').innerText = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
-        // --- MOBILE SCALING LOGIC ---
+        // --- MOBILE SCALING LOGIC (Visual Only) ---
         function fitPageToScreen() {
             const page = document.getElementById('page-container');
-            const pageWidth = page.offsetWidth; // This will be approx 794px (210mm)
+            const pageWidth = page.offsetWidth; 
             const screenWidth = window.innerWidth;
-            const padding = 20; // Safety padding
+            const padding = 20;
 
-            // Only scale if screen is smaller than the A4 page
             if (screenWidth < (pageWidth + padding)) {
                 const scale = (screenWidth - padding) / pageWidth;
-                
-                // Apply Scale
                 page.style.transform = `scale(${scale})`;
                 
-                // Adjust margin bottom to remove dead space caused by scaling
                 const originalHeight = page.offsetHeight;
                 const newHeight = originalHeight * scale;
                 const spaceToRemove = originalHeight - newHeight;
                 page.style.marginBottom = `-${spaceToRemove}px`;
             } else {
-                // Reset if screen is big enough
                 page.style.transform = 'none';
                 page.style.marginBottom = '0';
             }
         }
 
-        // Run scaling on load and resize
         window.addEventListener('load', fitPageToScreen);
         window.addEventListener('resize', fitPageToScreen);
+
+
+        // --- PDF GENERATION LOGIC ---
+        function generatePDF() {
+            const element = document.getElementById('page-container');
+            
+            // 1. Temporarily remove mobile scaling for clear PDF
+            const originalTransform = element.style.transform;
+            const originalMargin = element.style.marginBottom;
+            element.style.transform = 'none';
+            element.style.marginBottom = '0';
+
+            // 2. Configure PDF Settings
+            const opt = {
+                margin:       0,
+                filename:     'Fintech_Quotation.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true }, // scale:2 ensures high quality text
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // 3. Generate and Save
+            // Note: On iPhone this might open in a new tab/preview where you click 'Share' -> 'Save to Files'
+            html2pdf().set(opt).from(element).save().then(() => {
+                // 4. Restore mobile scaling view
+                element.style.transform = originalTransform;
+                element.style.marginBottom = originalMargin;
+            });
+        }
 
 
         function calculate() {
@@ -430,23 +447,19 @@
             const rows = document.querySelectorAll('#invoice-body tr');
 
             rows.forEach((row, index) => {
-                // Skip the last row (Total row)
                 if (index === rows.length - 1) return;
 
                 const qtyCell = row.cells[2];
                 const priceCell = row.cells[3];
                 const amtCell = row.cells[4];
 
-                // Remove commas and non-numeric chars for calculation
                 const qty = parseFloat(qtyCell.innerText.replace(/[^0-9.]/g, '')) || 0;
                 const price = parseFloat(priceCell.innerText.replace(/[^0-9.]/g, '')) || 0;
 
                 const lineTotal = qty * price;
                 
                 if (lineTotal > 0 || (qty > 0 || price > 0)) {
-                    // Update visuals only if user entered data
                     if(qty > 0) qtyCell.innerText = qty;
-                    // Format price nicely
                     if(price > 0) priceCell.innerText = price.toLocaleString('en-KE', {minimumFractionDigits: 0, maximumFractionDigits: 2});
                     
                     amtCell.innerText = lineTotal.toLocaleString('en-KE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -456,12 +469,10 @@
                 }
             });
 
-            // Update Grand Totals
             const formattedTotal = total.toLocaleString('en-KE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById('table-total-display').innerText = formattedTotal;
             document.getElementById('final-total-display').innerText = "KES " + formattedTotal;
             
-            // Number to Words Update
             if(total > 0) {
                 document.getElementById('words-output').innerText = numberToWords(Math.floor(total)) + " SHILLINGS ONLY"; 
             } else {
@@ -469,7 +480,6 @@
             }
         }
 
-        // --- Simple Number to Words Converter ---
         function numberToWords(n) {
             if (n < 0) return false;
             single = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
