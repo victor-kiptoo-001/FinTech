@@ -12,7 +12,7 @@
             --border-color: #dcdcdc;
             --ui-bg: #2c3e50;
             --ui-btn-calc: #3498db;
-            --ui-btn-print: #27ae60;
+            --ui-btn-download: #27ae60; /* Green for download */
         }
 
         @page {
@@ -221,7 +221,7 @@
         }
         .btn:hover { transform: translateY(-2px); }
         .btn-calc { background-color: var(--ui-btn-calc); color: white; }
-        .btn-print { background-color: var(--ui-btn-print); color: white; margin-bottom: 0; }
+        .btn-download { background-color: var(--ui-btn-download); color: white; margin-bottom: 0; }
         .helper-text { font-size: 11px; color: #bdc3c7; text-align: center; margin-top: 15px; font-style: italic; }
 
         @media print {
@@ -237,7 +237,7 @@
     <div class="controls">
         <h3>⚙️ CONTROLS</h3>
         <button class="btn btn-calc" onclick="calculate()">🔄 RECALCULATE</button>
-        <button class="btn btn-print" onclick="window.print()">🖨️ PRINT PDF</button>
+        <button class="btn btn-download" onclick="window.print()">⬇️ DOWNLOAD PDF</button>
         <div class="helper-text">Click blue areas to edit.</div>
     </div>
 
@@ -253,23 +253,21 @@
                 </table>
             </div>
             
-            <div style="width: 120px; height: 120px;">
+            <div style="width: 130px; height: 130px;">
                 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="100" cy="100" r="95" fill="none" stroke="#002b5c" stroke-width="6" />
+                    <circle cx="100" cy="100" r="95" fill="none" stroke="#002b5c" stroke-width="5" />
                     
-                    <path d="M70 60 Q100 30 130 60" fill="none" stroke="#002b5c" stroke-width="6" stroke-linecap="round" />
-                    <path d="M80 75 Q100 55 120 75" fill="none" stroke="#002b5c" stroke-width="6" stroke-linecap="round" />
+                    <path d="M75 55 Q100 30 125 55" fill="none" stroke="#002b5c" stroke-width="5" stroke-linecap="round" />
+                    <path d="M85 70 Q100 55 115 70" fill="none" stroke="#002b5c" stroke-width="5" stroke-linecap="round" />
                     
-                    <rect x="70" y="90" width="60" height="40" rx="5" fill="#002b5c" />
-                    <circle cx="100" cy="110" r="12" fill="white" />
-                    <circle cx="100" cy="110" r="6" fill="#002b5c" />
-                    <rect x="65" y="95" width="5" height="30" fill="#002b5c" />
+                    <path d="M65 90 H135 V130 H110 L100 140 L90 130 H65 V90 Z" fill="#002b5c" />
+                    <circle cx="85" cy="110" r="12" fill="white" stroke="#002b5c" stroke-width="3"/>
+                    <circle cx="85" cy="110" r="5" fill="#002b5c" />
                     
-                    <text x="100" y="155" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="24" fill="#002b5c">
-                        FIN-<tspan fill="#b30000">TECH</tspan>
+                    <text x="100" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="20" fill="#002b5c">
+                        FIN-TECH
                     </text>
-                    
-                    <text x="100" y="175" text-anchor="middle" font-family="Arial, sans-serif" font-weight="normal" font-size="14" letter-spacing="2" fill="#002b5c">
+                    <text x="100" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-weight="normal" font-size="12" letter-spacing="1" fill="#002b5c">
                         SOLUTIONS
                     </text>
                 </svg>
