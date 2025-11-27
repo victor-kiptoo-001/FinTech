@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fin-Tech Quotation System</title>
+    <title>Fin-Tech Solutions Quotation</title>
     <style>
         /* --- VISUAL CONFIGURATION --- */
         :root {
@@ -29,6 +29,7 @@
             min-height: 100vh;
         }
 
+        /* --- THE A4 PAGE --- */
         .page {
             width: 210mm;
             height: 297mm; 
@@ -63,26 +64,11 @@
         .meta-table td { padding: 2px 0; }
         .meta-label { padding-right: 15px; }
 
-        /* --- LOGO STYLING --- */
-        #logo-display {
+        /* --- LOGO IMAGE --- */
+        .logo-img {
             width: 130px;
             height: 130px;
-            object-fit: contain; /* Ensures logo fits perfectly without stretching */
-            display: none; /* Hidden by default */
-        }
-
-        #logo-placeholder {
-            width: 130px; 
-            height: 130px; 
-            border: 2px dashed #ccc; 
-            border-radius: 8px;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: #999; 
-            font-size: 10px; 
-            text-align: center;
-            background: #f9f9f9;
+            object-fit: contain;
         }
 
         /* --- INFO BOXES --- */
@@ -244,29 +230,7 @@
         .btn-blue { background-color: var(--ui-btn-blue); color: white; }
         .btn-green { background-color: var(--ui-btn-green); color: white; }
         
-        /* File Input Styling */
-        .file-upload-wrapper {
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        input[type="file"] {
-            display: none;
-        }
-        .custom-file-upload {
-            border: 1px dashed #ccc;
-            display: inline-block;
-            padding: 10px 12px;
-            cursor: pointer;
-            color: #eee;
-            background: rgba(255,255,255,0.1);
-            font-size: 12px;
-            width: 100%;
-            box-sizing: border-box;
-            border-radius: 4px;
-        }
-        .custom-file-upload:hover {
-            background: rgba(255,255,255,0.2);
-        }
+        .helper-text { font-size: 11px; color: #bdc3c7; text-align: center; margin-top: 15px; font-style: italic; }
 
         @media print {
             body { background: none; margin: 0; padding: 0; display: block; }
@@ -278,22 +242,18 @@
 </head>
 <body>
 
+    <!-- CONTROL PANEL (Visible on Screen, Hidden on Print) -->
     <div class="controls">
         <h3>⚙️ CONTROLS</h3>
-        
-        <div class="file-upload-wrapper">
-            <label for="logo-upload" class="custom-file-upload">
-                📷 CLICK TO SELECT LOGO
-            </label>
-            <input id="logo-upload" type="file" accept="image/*" onchange="loadLogo(event)"/>
-        </div>
-
         <button class="btn btn-blue" onclick="calculate()">🔄 RECALCULATE</button>
         <button class="btn btn-green" onclick="window.print()">⬇️ DOWNLOAD PDF</button>
+        <div class="helper-text">Edit the document by clicking directly on the text areas.</div>
     </div>
 
+    <!-- THE A4 DOCUMENT -->
     <div class="page">
         
+        <!-- HEADER -->
         <div class="header">
             <div class="header-left">
                 <h1>Quotation</h1>
@@ -304,12 +264,14 @@
                 </table>
             </div>
             
+            <!-- PERMANENT LOGO -->
+            <!-- Vercel will look for 'LOGO.jpeg' in the root folder -->
             <div>
-                <img id="logo-display" src="" alt="Company Logo">
-                <div id="logo-placeholder">NO LOGO SELECTED</div>
+                <img src="LOGO.jpeg" alt="Fin-Tech Solutions" class="logo-img" onerror="this.style.display='none'; alert('Logo not found! Make sure LOGO.jpeg is in the same folder.');">
             </div>
         </div>
 
+        <!-- INFO BOXES -->
         <div class="info-section">
             <div class="info-box">
                 <h3>Quotation From</h3>
@@ -329,6 +291,7 @@
             </div>
         </div>
 
+        <!-- ITEMS TABLE -->
         <table class="items-table">
             <thead>
                 <tr>
@@ -340,6 +303,7 @@
                 </tr>
             </thead>
             <tbody id="invoice-body">
+                <!-- 10 Editable Rows -->
                 <tr><td class="col-no">1.</td><td contenteditable="true"></td><td class="col-qty" contenteditable="true" onblur="calculate()"></td><td class="col-price" contenteditable="true" onblur="calculate()"></td><td class="col-amt"></td></tr>
                 <tr><td class="col-no">2.</td><td contenteditable="true"></td><td class="col-qty" contenteditable="true" onblur="calculate()"></td><td class="col-price" contenteditable="true" onblur="calculate()"></td><td class="col-amt"></td></tr>
                 <tr><td class="col-no">3.</td><td contenteditable="true"></td><td class="col-qty" contenteditable="true" onblur="calculate()"></td><td class="col-price" contenteditable="true" onblur="calculate()"></td><td class="col-amt"></td></tr>
@@ -358,6 +322,7 @@
             </tbody>
         </table>
 
+        <!-- TOTALS -->
         <div class="totals-section">
             <div class="amount-words">
                 Total (in words) : <span id="words-output" style="text-transform: uppercase;"></span>
@@ -368,6 +333,7 @@
             </div>
         </div>
 
+        <!-- BANK DETAILS -->
         <div class="bank-details">
             <h3>Bank Details</h3>
             <div class="bank-grid">
@@ -377,6 +343,7 @@
             </div>
         </div>
 
+        <!-- FOOTER & TERMS -->
         <div class="footer-wrapper">
             <div class="footer-strip">
                 <span>406653-O</span><span>33 783-3015</span><span>DUKE</span><span>Page 1 of 2</span>
@@ -393,48 +360,36 @@
 
     </div>
 
+    <!-- JAVASCRIPT LOGIC -->
     <script>
+        // Set Default Date
         const today = new Date();
         document.getElementById('date-field').innerText = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-
-        // --- NEW ROBUST IMAGE LOADER (FileReader) ---
-        function loadLogo(event) {
-            const file = event.target.files[0];
-            if (file) {
-                // We use FileReader which works better for local files than createObjectURL
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById('logo-display');
-                    const placeholder = document.getElementById('logo-placeholder');
-                    
-                    // Assign the Base64 string directly to the source
-                    img.src = e.target.result;
-                    img.style.display = 'block';
-                    placeholder.style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            }
-        }
 
         function calculate() {
             let total = 0;
             const rows = document.querySelectorAll('#invoice-body tr');
 
             rows.forEach((row, index) => {
+                // Skip the last row (Total row)
                 if (index === rows.length - 1) return;
 
                 const qtyCell = row.cells[2];
                 const priceCell = row.cells[3];
                 const amtCell = row.cells[4];
 
+                // Remove commas and non-numeric chars for calculation
                 const qty = parseFloat(qtyCell.innerText.replace(/[^0-9.]/g, '')) || 0;
                 const price = parseFloat(priceCell.innerText.replace(/[^0-9.]/g, '')) || 0;
 
                 const lineTotal = qty * price;
                 
                 if (lineTotal > 0 || (qty > 0 || price > 0)) {
+                    // Update visuals only if user entered data
                     if(qty > 0) qtyCell.innerText = qty;
+                    // Format price nicely
                     if(price > 0) priceCell.innerText = price.toLocaleString('en-KE', {minimumFractionDigits: 0, maximumFractionDigits: 2});
+                    
                     amtCell.innerText = lineTotal.toLocaleString('en-KE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                     total += lineTotal;
                 } else {
@@ -442,10 +397,12 @@
                 }
             });
 
+            // Update Grand Totals
             const formattedTotal = total.toLocaleString('en-KE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById('table-total-display').innerText = formattedTotal;
             document.getElementById('final-total-display').innerText = "KES " + formattedTotal;
             
+            // Number to Words Update
             if(total > 0) {
                 document.getElementById('words-output').innerText = numberToWords(Math.floor(total)) + " SHILLINGS ONLY"; 
             } else {
@@ -453,6 +410,7 @@
             }
         }
 
+        // --- Simple Number to Words Converter ---
         function numberToWords(n) {
             if (n < 0) return false;
             single = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
