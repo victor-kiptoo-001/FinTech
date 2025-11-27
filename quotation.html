@@ -9,10 +9,9 @@
         :root {
             --brand-purple: #553c8b;
             --light-purple-bg: #ecebf3;
-            --border-color: #dcdcdc;
             --ui-bg: #2c3e50;
-            --ui-btn-calc: #3498db;
-            --ui-btn-download: #27ae60; /* Green for download */
+            --ui-btn-blue: #3498db;
+            --ui-btn-green: #27ae60;
         }
 
         @page {
@@ -63,6 +62,28 @@
         }
         .meta-table td { padding: 2px 0; }
         .meta-label { padding-right: 15px; }
+
+        /* --- LOGO STYLING --- */
+        #logo-display {
+            width: 130px;
+            height: 130px;
+            object-fit: contain; /* Ensures logo fits perfectly without stretching */
+            display: none; /* Hidden by default */
+        }
+
+        #logo-placeholder {
+            width: 130px; 
+            height: 130px; 
+            border: 2px dashed #ccc; 
+            border-radius: 8px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: #999; 
+            font-size: 10px; 
+            text-align: center;
+            background: #f9f9f9;
+        }
 
         /* --- INFO BOXES --- */
         .info-section {
@@ -211,7 +232,7 @@
             display: block;
             width: 100%;
             padding: 12px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             cursor: pointer;
             border: none;
             border-radius: 6px;
@@ -220,9 +241,32 @@
             transition: transform 0.1s;
         }
         .btn:hover { transform: translateY(-2px); }
-        .btn-calc { background-color: var(--ui-btn-calc); color: white; }
-        .btn-download { background-color: var(--ui-btn-download); color: white; margin-bottom: 0; }
-        .helper-text { font-size: 11px; color: #bdc3c7; text-align: center; margin-top: 15px; font-style: italic; }
+        .btn-blue { background-color: var(--ui-btn-blue); color: white; }
+        .btn-green { background-color: var(--ui-btn-green); color: white; }
+        
+        /* File Input Styling */
+        .file-upload-wrapper {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            border: 1px dashed #ccc;
+            display: inline-block;
+            padding: 10px 12px;
+            cursor: pointer;
+            color: #eee;
+            background: rgba(255,255,255,0.1);
+            font-size: 12px;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+        .custom-file-upload:hover {
+            background: rgba(255,255,255,0.2);
+        }
 
         @media print {
             body { background: none; margin: 0; padding: 0; display: block; }
@@ -236,9 +280,16 @@
 
     <div class="controls">
         <h3>⚙️ CONTROLS</h3>
-        <button class="btn btn-calc" onclick="calculate()">🔄 RECALCULATE</button>
-        <button class="btn btn-download" onclick="window.print()">⬇️ DOWNLOAD PDF</button>
-        <div class="helper-text">Click blue areas to edit.</div>
+        
+        <div class="file-upload-wrapper">
+            <label for="logo-upload" class="custom-file-upload">
+                📷 CLICK TO SELECT LOGO
+            </label>
+            <input id="logo-upload" type="file" accept="image/*" onchange="loadLogo(event)"/>
+        </div>
+
+        <button class="btn btn-blue" onclick="calculate()">🔄 RECALCULATE</button>
+        <button class="btn btn-green" onclick="window.print()">⬇️ DOWNLOAD PDF</button>
     </div>
 
     <div class="page">
@@ -253,24 +304,9 @@
                 </table>
             </div>
             
-            <div style="width: 130px; height: 130px;">
-                <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="100" cy="100" r="95" fill="none" stroke="#002b5c" stroke-width="5" />
-                    
-                    <path d="M75 55 Q100 30 125 55" fill="none" stroke="#002b5c" stroke-width="5" stroke-linecap="round" />
-                    <path d="M85 70 Q100 55 115 70" fill="none" stroke="#002b5c" stroke-width="5" stroke-linecap="round" />
-                    
-                    <path d="M65 90 H135 V130 H110 L100 140 L90 130 H65 V90 Z" fill="#002b5c" />
-                    <circle cx="85" cy="110" r="12" fill="white" stroke="#002b5c" stroke-width="3"/>
-                    <circle cx="85" cy="110" r="5" fill="#002b5c" />
-                    
-                    <text x="100" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="20" fill="#002b5c">
-                        FIN-TECH
-                    </text>
-                    <text x="100" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-weight="normal" font-size="12" letter-spacing="1" fill="#002b5c">
-                        SOLUTIONS
-                    </text>
-                </svg>
+            <div>
+                <img id="logo-display" src="" alt="Company Logo">
+                <div id="logo-placeholder">NO LOGO SELECTED</div>
             </div>
         </div>
 
@@ -361,6 +397,25 @@
         const today = new Date();
         document.getElementById('date-field').innerText = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
+        // --- NEW ROBUST IMAGE LOADER (FileReader) ---
+        function loadLogo(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // We use FileReader which works better for local files than createObjectURL
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('logo-display');
+                    const placeholder = document.getElementById('logo-placeholder');
+                    
+                    // Assign the Base64 string directly to the source
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
         function calculate() {
             let total = 0;
             const rows = document.querySelectorAll('#invoice-body tr');
@@ -398,7 +453,6 @@
             }
         }
 
-        // --- Simple Number to Words Function ---
         function numberToWords(n) {
             if (n < 0) return false;
             single = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
@@ -415,7 +469,7 @@
             if (n < 100) return formatTenth(n);
             if (n < 1000) return single[Math.floor(n / 100)] + " Hundred " + (n % 100 ? numberToWords(n % 100) : "");
             if (n < 1000000) return numberToWords(Math.floor(n / 1000)) + " Thousand " + (n % 1000 ? numberToWords(n % 1000) : "");
-            return n.toString(); // Fallback for millions
+            return n.toString(); 
         }
     </script>
 </body>
