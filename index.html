@@ -25,19 +25,25 @@
             margin: 0;
             padding: 30px;
             display: flex;
-            justify-content: center;
+            flex-direction: column; /* Stack controls and page */
+            align-items: center;
             min-height: 100vh;
         }
 
         /* --- THE A4 PAGE --- */
         .page {
             width: 210mm;
+            min-width: 210mm; /* Force A4 width to prevent squishing */
             height: 297mm; 
+            min-height: 297mm;
             background: white;
             padding: 15mm 15mm;
             box-sizing: border-box;
             position: relative;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            /* Transform settings for mobile scaling */
+            transform-origin: top center;
+            transition: transform 0.2s ease;
         }
 
         /* --- HEADER --- */
@@ -212,6 +218,21 @@
             z-index: 100;
         }
 
+        /* Mobile Controls Adjustment */
+        @media (max-width: 900px) {
+            .controls {
+                position: relative;
+                top: auto;
+                right: auto;
+                width: 100%;
+                max-width: 500px;
+                margin-bottom: 20px;
+            }
+            body {
+                padding: 10px;
+            }
+        }
+
         .controls h3 { margin: 0 0 15px 0; text-align: center; color: #ecf0f1; }
 
         .btn {
@@ -234,7 +255,14 @@
 
         @media print {
             body { background: none; margin: 0; padding: 0; display: block; }
-            .page { box-shadow: none; margin: 0; width: 210mm; height: 297mm; page-break-after: always; }
+            .page { 
+                box-shadow: none; 
+                margin: 0; 
+                width: 210mm; 
+                height: 297mm; 
+                page-break-after: always;
+                transform: none !important; /* Reset scaling for print */
+            }
             .controls { display: none !important; }
             [contenteditable]:hover { outline: none; background: none; }
         }
@@ -251,7 +279,7 @@
     </div>
 
     <!-- THE A4 DOCUMENT -->
-    <div class="page">
+    <div id="page-container" class="page">
         
         <!-- HEADER -->
         <div class="header">
@@ -365,6 +393,37 @@
         // Set Default Date
         const today = new Date();
         document.getElementById('date-field').innerText = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+        // --- MOBILE SCALING LOGIC ---
+        function fitPageToScreen() {
+            const page = document.getElementById('page-container');
+            const pageWidth = page.offsetWidth; // This will be approx 794px (210mm)
+            const screenWidth = window.innerWidth;
+            const padding = 20; // Safety padding
+
+            // Only scale if screen is smaller than the A4 page
+            if (screenWidth < (pageWidth + padding)) {
+                const scale = (screenWidth - padding) / pageWidth;
+                
+                // Apply Scale
+                page.style.transform = `scale(${scale})`;
+                
+                // Adjust margin bottom to remove dead space caused by scaling
+                const originalHeight = page.offsetHeight;
+                const newHeight = originalHeight * scale;
+                const spaceToRemove = originalHeight - newHeight;
+                page.style.marginBottom = `-${spaceToRemove}px`;
+            } else {
+                // Reset if screen is big enough
+                page.style.transform = 'none';
+                page.style.marginBottom = '0';
+            }
+        }
+
+        // Run scaling on load and resize
+        window.addEventListener('load', fitPageToScreen);
+        window.addEventListener('resize', fitPageToScreen);
+
 
         function calculate() {
             let total = 0;
