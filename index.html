@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fin-Tech Solutions Quotation</title>
-    <!-- Import html2pdf library for true file downloading -->
+    <!-- Import html2pdf library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* --- VISUAL CONFIGURATION --- */
@@ -27,7 +27,7 @@
             margin: 0;
             padding: 30px;
             display: flex;
-            flex-direction: column; /* Stack controls and page */
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
         }
@@ -36,10 +36,10 @@
         .page {
             width: 210mm;
             min-width: 210mm;
-            /* STRICT 1 PAGE ENFORCEMENT */
-            height: 297mm; 
-            max-height: 297mm;
-            overflow: hidden; /* Cuts off anything that spills over */
+            /* 1MM Safety buffer to prevent 2nd page spillover */
+            height: 296mm; 
+            max-height: 296mm;
+            overflow: hidden; 
             
             background: white;
             padding: 15mm 15mm;
@@ -57,13 +57,13 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start; 
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .header-left h1 {
             color: var(--brand-purple);
             font-size: 28px;
-            margin: 0 0 20px 0;
+            margin: 0 0 15px 0;
             font-weight: normal;
         }
 
@@ -76,7 +76,7 @@
         .meta-table td { padding: 2px 0; }
         .meta-label { padding-right: 15px; }
 
-        /* --- LOGO IMAGE --- */
+        /* --- LOGO --- */
         .logo-img {
             width: 130px;
             height: 130px;
@@ -87,8 +87,8 @@
         .info-section {
             display: flex;
             gap: 15px;
-            margin-bottom: 25px;
-            height: 130px; 
+            margin-bottom: 20px;
+            height: 120px; 
         }
 
         .info-box {
@@ -119,7 +119,7 @@
         thead tr {
             background-color: var(--brand-purple);
             color: white;
-            height: 32px;
+            height: 30px;
         }
 
         th {
@@ -130,7 +130,7 @@
         }
         th:last-child { border-right: none; }
 
-        td { padding: 8px 10px; color: #000; }
+        td { padding: 6px 10px; color: #000; }
 
         tbody tr:nth-child(even) { background-color: #f2f2f9; }
         
@@ -150,7 +150,7 @@
             justify-content: space-between;
             align-items: flex-end;
             margin-top: 10px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .amount-words { font-size: 11px; font-weight: bold; }
@@ -166,21 +166,37 @@
             font-size: 14px;
         }
 
-        /* --- BANK --- */
+        /* --- BANK DETAILS (Fixed for PDF) --- */
         .bank-details {
             background-color: var(--light-purple-bg);
             border-radius: 8px;
-            padding: 15px;
-            width: 42%;
+            padding: 10px 15px;
+            width: 45%;
             font-size: 12px;
+            /* Force solid rendering for PDF */
+            -webkit-print-color-adjust: exact; 
         }
         
-        .bank-grid {
-            display: grid;
-            grid-template-columns: 90px 1fr;
-            gap: 5px 0;
+        .bank-details h3 {
+            color: var(--brand-purple);
+            margin: 0 0 5px 0;
+            font-size: 12px;
         }
-        .bank-label { font-weight: bold; }
+
+        /* Using Table instead of Grid for Mobile PDF compatibility */
+        .bank-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .bank-table td {
+            padding: 2px 0;
+            color: #000; /* Force black text */
+        }
+        .bank-label {
+            width: 90px;
+            font-weight: bold;
+            color: #000;
+        }
 
         /* --- FOOTER --- */
         .footer-wrapper {
@@ -197,7 +213,7 @@
             justify-content: space-between;
             font-size: 9px;
             color: #333;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .terms { font-size: 10px; color: #333; }
@@ -224,7 +240,7 @@
             z-index: 100;
         }
 
-        /* Mobile Controls Adjustment */
+        /* Mobile Controls */
         @media (max-width: 900px) {
             .controls {
                 position: relative;
@@ -234,9 +250,7 @@
                 max-width: 500px;
                 margin-bottom: 20px;
             }
-            body {
-                padding: 10px;
-            }
+            body { padding: 10px; }
         }
 
         .controls h3 { margin: 0 0 15px 0; text-align: center; color: #ecf0f1; }
@@ -259,22 +273,19 @@
         
         .helper-text { font-size: 11px; color: #bdc3c7; text-align: center; margin-top: 15px; font-style: italic; }
 
-        /* HIDE CONTROLS WHEN GENERATING PDF IF NEEDED */
-        .hide-for-pdf .controls { display: none !important; }
     </style>
 </head>
 <body>
 
-    <!-- CONTROL PANEL -->
+    <!-- CONTROLS -->
     <div class="controls">
         <h3>⚙️ CONTROLS</h3>
         <button class="btn btn-blue" onclick="calculate()">🔄 RECALCULATE</button>
-        <!-- Calls the new PDF function instead of window.print() -->
         <button class="btn btn-green" onclick="generatePDF()">⬇️ DOWNLOAD PDF</button>
-        <div class="helper-text">Edit by clicking text. System works on Android/iOS/PC.</div>
+        <div class="helper-text">Edit by clicking text.</div>
     </div>
 
-    <!-- THE A4 DOCUMENT -->
+    <!-- DOCUMENT -->
     <div id="page-container" class="page">
         
         <!-- HEADER -->
@@ -288,13 +299,13 @@
                 </table>
             </div>
             
-            <!-- PERMANENT LOGO -->
+            <!-- LOGO -->
             <div>
                 <img src="LOGO.jpeg" alt="Fin-Tech Solutions" class="logo-img" onerror="this.style.display='none';">
             </div>
         </div>
 
-        <!-- INFO BOXES -->
+        <!-- INFO -->
         <div class="info-section">
             <div class="info-box">
                 <h3>Quotation From</h3>
@@ -314,7 +325,7 @@
             </div>
         </div>
 
-        <!-- ITEMS TABLE -->
+        <!-- ITEMS -->
         <table class="items-table">
             <thead>
                 <tr>
@@ -326,7 +337,6 @@
                 </tr>
             </thead>
             <tbody id="invoice-body">
-                <!-- 10 Rows Fixed -->
                 <tr><td class="col-no">1.</td><td contenteditable="true"></td><td class="col-qty" contenteditable="true" onblur="calculate()"></td><td class="col-price" contenteditable="true" onblur="calculate()"></td><td class="col-amt"></td></tr>
                 <tr><td class="col-no">2.</td><td contenteditable="true"></td><td class="col-qty" contenteditable="true" onblur="calculate()"></td><td class="col-price" contenteditable="true" onblur="calculate()"></td><td class="col-amt"></td></tr>
                 <tr><td class="col-no">3.</td><td contenteditable="true"></td><td class="col-qty" contenteditable="true" onblur="calculate()"></td><td class="col-price" contenteditable="true" onblur="calculate()"></td><td class="col-amt"></td></tr>
@@ -356,20 +366,29 @@
             </div>
         </div>
 
-        <!-- BANK DETAILS -->
+        <!-- BANK DETAILS (Table based for better PDF support) -->
         <div class="bank-details">
             <h3>Bank Details</h3>
-            <div class="bank-grid">
-                <span class="bank-label">ACC name</span><span>Duke Kimutai Samoei</span>
-                <span class="bank-label">ACC no.</span><span>1022529494</span>
-                <span class="bank-label">Bank</span><span>UNAITAS</span>
-            </div>
+            <table class="bank-table">
+                <tr>
+                    <td class="bank-label">ACC name</td>
+                    <td>Duke Kimutai Samoei</td>
+                </tr>
+                <tr>
+                    <td class="bank-label">ACC no.</td>
+                    <td>1022529494</td>
+                </tr>
+                <tr>
+                    <td class="bank-label">Bank</td>
+                    <td>UNAITAS</td>
+                </tr>
+            </table>
         </div>
 
-        <!-- FOOTER & TERMS -->
+        <!-- FOOTER -->
         <div class="footer-wrapper">
             <div class="footer-strip">
-                <span>406653-O</span><span>33 783-3015</span><span>DUKE</span><span>Page 1 of 2</span>
+                <span>406653-O</span><span>33 783-3015</span><span>DUKE</span><span>Page 1 of 1</span>
             </div>
             <div class="terms">
                 <h4>Terms and Conditions</h4>
@@ -383,64 +402,64 @@
 
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- LOGIC -->
     <script>
         const today = new Date();
         document.getElementById('date-field').innerText = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
-        // --- MOBILE SCALING LOGIC (Visual Only) ---
+        // --- MOBILE SCALING ---
         function fitPageToScreen() {
             const page = document.getElementById('page-container');
-            const pageWidth = page.offsetWidth; 
+            const pageWidth = 210 * 3.7795275591; // approx px width of 210mm
             const screenWidth = window.innerWidth;
             const padding = 20;
 
             if (screenWidth < (pageWidth + padding)) {
                 const scale = (screenWidth - padding) / pageWidth;
                 page.style.transform = `scale(${scale})`;
-                
-                const originalHeight = page.offsetHeight;
-                const newHeight = originalHeight * scale;
-                const spaceToRemove = originalHeight - newHeight;
-                page.style.marginBottom = `-${spaceToRemove}px`;
+                // Adjust margins so it doesn't float in middle of whitespace
+                const h = page.offsetHeight;
+                page.style.marginBottom = `-${h - (h*scale)}px`;
             } else {
                 page.style.transform = 'none';
                 page.style.marginBottom = '0';
             }
         }
-
         window.addEventListener('load', fitPageToScreen);
         window.addEventListener('resize', fitPageToScreen);
 
-
-        // --- PDF GENERATION LOGIC ---
+        // --- PDF DOWNLOAD ---
         function generatePDF() {
             const element = document.getElementById('page-container');
             
-            // 1. Temporarily remove mobile scaling for clear PDF
+            // 1. Reset Scale for clean capture
             const originalTransform = element.style.transform;
             const originalMargin = element.style.marginBottom;
+            const originalShadow = element.style.boxShadow;
+            
             element.style.transform = 'none';
             element.style.marginBottom = '0';
+            element.style.boxShadow = 'none'; // Remove shadow to prevent height calc errors
 
-            // 2. Configure PDF Settings
             const opt = {
                 margin:       0,
                 filename:     'Fintech_Quotation.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true }, // scale:2 ensures high quality text
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true,
+                    scrollY: 0 // Prevents scrolling offset bugs
+                },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // 3. Generate and Save
-            // Note: On iPhone this might open in a new tab/preview where you click 'Share' -> 'Save to Files'
             html2pdf().set(opt).from(element).save().then(() => {
-                // 4. Restore mobile scaling view
+                // Restore UI
                 element.style.transform = originalTransform;
                 element.style.marginBottom = originalMargin;
+                element.style.boxShadow = originalShadow;
             });
         }
-
 
         function calculate() {
             let total = 0;
@@ -461,7 +480,6 @@
                 if (lineTotal > 0 || (qty > 0 || price > 0)) {
                     if(qty > 0) qtyCell.innerText = qty;
                     if(price > 0) priceCell.innerText = price.toLocaleString('en-KE', {minimumFractionDigits: 0, maximumFractionDigits: 2});
-                    
                     amtCell.innerText = lineTotal.toLocaleString('en-KE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                     total += lineTotal;
                 } else {
