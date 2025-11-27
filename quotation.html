@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fin-Tech Solutions Quotation</title>
+    <style>
+        :root {
+            --primary-purple: #5e4b8b; /* Approximate matching purple */
+            --header-bg: #EAE8F5; /* Light purple bg for boxes */
+            --table-header: #583e8c; /* Darker purple for table head */
+            --border-color: #ddd;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        /* The A4 Page Container */
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            margin: 0 auto;
+            padding: 10mm 15mm;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        /* --- Header Section --- */
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .logo-section {
+            text-align: right;
+        }
+        
+        /* Logo Circle Simulation */
+        .logo-circle {
+            width: 100px;
+            height: 100px;
+            border: 3px solid #003366; /* Dark Blue */
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            float: right;
+            color: #003366;
+            font-weight: bold;
+            font-size: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .logo-circle span.tech {
+            color: #b32d2d; /* Redish color */
+            font-size: 14px;
+        }
+
+        .title-block h1 {
+            color: var(--primary-purple);
+            margin: 0 0 10px 0;
+            font-size: 24px;
+        }
+
+        .meta-data {
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .meta-row {
+            display: flex;
+            gap: 10px;
+        }
+        .meta-label { font-weight: bold; width: 100px; }
+
+        /* --- Info Boxes --- */
+        .info-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background-color: var(--header-bg);
+            padding: 15px;
+            border-radius: 5px;
+            flex: 1;
+            font-size: 12px;
+        }
+
+        .info-box h3 {
+            color: var(--primary-purple);
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .info-content p { margin: 2px 0; }
+
+        /* --- Table --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        thead {
+            background-color: var(--table-header);
+            color: white;
+        }
+
+        th {
+            padding: 8px;
+            text-align: left;
+            font-weight: normal;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:nth-child(even) { background-color: #f9f9f9; }
+
+        .col-num { width: 30px; text-align: center; }
+        .col-qty { width: 60px; text-align: center; }
+        .col-price { width: 100px; text-align: right; }
+        .col-total { width: 100px; text-align: right; font-weight: bold; }
+        
+        /* Total Section */
+        .grand-total-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            border-top: 2px solid #333;
+            border-bottom: 2px solid #333;
+            padding: 10px 0;
+        }
+
+        .total-words {
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .total-figures {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* --- Bank Details --- */
+        .bank-box {
+            background-color: var(--header-bg);
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            margin-top: 20px;
+            width: 50%;
+        }
+        .bank-row {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        .bank-label { font-weight: bold; width: 120px; }
+
+        /* --- Footer Terms --- */
+        .footer {
+            margin-top: 30px;
+            border-top: 1px dotted #999;
+            padding-top: 10px;
+            font-size: 10px;
+            color: #444;
+        }
+        .terms h4 { color: var(--primary-purple); margin-bottom: 5px; }
+        .terms ol { padding-left: 20px; margin: 0; }
+        .terms li { margin-bottom: 3px; }
+
+        /* --- UI Controls (Hidden on Print) --- */
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            width: 300px;
+            z-index: 1000;
+        }
+        .controls h2 { margin-top: 0; font-size: 18px; }
+        .controls input, .controls button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .controls button {
+            background: var(--table-header);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .controls button:hover { background: #452d75; }
+        
+        /* Editable Content Styles */
+        [contenteditable]:hover {
+            outline: 1px dashed #999;
+            background: rgba(255,255,0,0.1);
+            cursor: text;
+        }
+
+        @media print {
+            body { background: white; margin: 0; padding: 0; }
+            .page { box-shadow: none; margin: 0; width: 100%; height: auto; }
+            .controls { display: none; }
+            [contenteditable]:hover { outline: none; background: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <h2>Quotation System</h2>
+        <button onclick="addItem()">+ Add New Item</button>
+        <button onclick="calculateTotals()">Recalculate Totals</button>
+        <button onclick="window.print()" style="background: #28a745;">Print / Save PDF</button>
+        <hr>
+        <small>Tip: Click directly on "Quotation For", Dates, or Item Names to edit text.</small>
+    </div>
+
+    <div class="page" id="invoice">
+        
+        <div class="header-top">
+            <div class="title-block">
+                <h1>Quotation</h1>
+                <div class="meta-data">
+                    <div class="meta-row">
+                        <span class="meta-label">Quotation No #</span>
+                        <span contenteditable="true">A00052-O</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Quotation Date</span>
+                        <span contenteditable="true"></span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-label">Valid Till Date</span>
+                        <span contenteditable="true"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="logo-section">
+                <div class="logo-circle">
+                    <div><span class="tech">FIN-TECH</span></div>
+                    <div>SOLUTIONS</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-container">
+            <div class="info-box">
+                <h3>Quotation From</h3>
+                <div class="info-content">
+                    <strong>Fin-Tech Solutions</strong><br>
+                    +254 714 558 073<br>
+                    +254 788 906 949<br>
+                    dukesamoei@gmail.com<br>
+                    P.O.BOX 362-30100<br>
+                    ELDORET, KENYA
+                </div>
+            </div>
+            <div class="info-box" style="background-color: #EAE8F5;">
+                <h3>Quotation For</h3>
+                <div class="info-content" contenteditable="true">
+                    [Click to Enter Client Name]<br>
+                    [Address]<br>
+                    [City, Country]
+                </div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th class="col-num">No.</th>
+                    <th>Item Description</th>
+                    <th class="col-qty">Qty</th>
+                    <th class="col-price">Unit Price</th>
+                    <th class="col-total">Amount</th>
+                    <th style="width: 20px;"></th> </tr>
+            </thead>
+            <tbody id="items-body">
+                <tr>
+                    <td class="col-num">1.</td>
+                    <td contenteditable="true">8 Channel Hikvision DVR</td>
+                    <td class="col-qty" contenteditable="true" oninput="calculateTotals()">1</td>
+                    <td class="col-price" contenteditable="true" oninput="calculateTotals()">0</td>
+                    <td class="col-total">0.00</td>
+                    <td class="no-print" style="cursor:pointer; color:red; text-align:center;" onclick="deleteRow(this)">x</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="grand-total-section">
+            <div class="total-words">Total (in words): <span id="words-total">ZERO SHILLINGS ONLY</span></div>
+            <div class="total-figures">
+                TOTAL (KES) &nbsp;&nbsp;&nbsp; <span id="numeric-total">KES 0.00</span>
+            </div>
+        </div>
+
+        <div class="bank-box">
+            <div style="color: #5e4b8b; font-weight: bold; margin-bottom: 5px;">Bank Details</div>
+            <div class="bank-row">
+                <span class="bank-label">Account Name</span>
+                <span>Duke Kimutai Samoei</span>
+            </div>
+            <div class="bank-row">
+                <span class="bank-label">Account Number</span>
+                <span>1022529494</span>
+            </div>
+            <div class="bank-row">
+                <span class="bank-label">Bank</span>
+                <span>UNAITAS</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="terms">
+                <h4>Terms and Conditions</h4>
+                <ol>
+                    <li><strong>GUARANTEE:</strong> 12 Month warranty against manufacturing defects on above products.</li>
+                    <li><strong>MAINTENANCE/AFTER SALE SERVICES:</strong> Fin-Tech Solutions is staffed with trained and skilled professionals who are skilled in repair maintenance of all products sold by us.</li>
+                    <li><strong>PAYMENT TERM:</strong> 60% upon confirmation of order and 40% upon completion or otherwise agreed.</li>
+                </ol>
+            </div>
+            <div style="text-align: right; margin-top: 10px;">Page 1 of 1</div>
+        </div>
+
+    </div>
+
+    <script>
+        function addItem() {
+            const tbody = document.getElementById('items-body');
+            const rowCount = tbody.rows.length + 1;
+            const row = tbody.insertRow();
+            
+            row.innerHTML = `
+                <td class="col-num">${rowCount}.</td>
+                <td contenteditable="true">New Item Description</td>
+                <td class="col-qty" contenteditable="true" oninput="calculateTotals()">1</td>
+                <td class="col-price" contenteditable="true" oninput="calculateTotals()">0</td>
+                <td class="col-total">0.00</td>
+                <td class="no-print" style="cursor:pointer; color:red; text-align:center;" onclick="deleteRow(this)">x</td>
+            `;
+        }
+
+        function deleteRow(btn) {
+            const row = btn.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+            renumberRows();
+            calculateTotals();
+        }
+
+        function renumberRows() {
+            const rows = document.getElementById('items-body').rows;
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].cells[0].innerText = (i + 1) + ".";
+            }
+        }
+
+        function calculateTotals() {
+            const rows = document.getElementById('items-body').rows;
+            let grandTotal = 0;
+
+            for (let i = 0; i < rows.length; i++) {
+                const qtyText = rows[i].cells[2].innerText;
+                const priceText = rows[i].cells[3].innerText;
+                
+                // Clean inputs
+                const qty = parseFloat(qtyText.replace(/[^0-9.]/g, '')) || 0;
+                const price = parseFloat(priceText.replace(/[^0-9.]/g, '')) || 0;
+                
+                const total = qty * price;
+                grandTotal += total;
+
+                // Update Row Total
+                rows[i].cells[4].innerText = total.toLocaleString('en-KE', {minimumFractionDigits: 2});
+            }
+
+            // Update Grand Total
+            document.getElementById('numeric-total').innerText = "KES " + grandTotal.toLocaleString('en-KE', {minimumFractionDigits: 2});
+            
+            // Simple Number to Words (Simplified for basic use)
+            document.getElementById('words-total').innerText = numberToWords(grandTotal) + " SHILLINGS ONLY";
+        }
+
+        function numberToWords(amount) {
+            if (amount === 0) return "ZERO";
+            // This is a placeholder for a full library. 
+            // For now, it returns the number as text if complex logic isn't added.
+            // You can integrate a library like number-to-words.js if needed.
+            return amount.toString().toUpperCase() + " (IN FIGURES)"; 
+        }
+
+        // Initialize with correct date
+        const today = new Date();
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        document.querySelector('.meta-data .meta-row:nth-child(2) span:last-child').innerText = today.toLocaleDateString('en-US', options);
+
+    </script>
+</body>
+</html>
